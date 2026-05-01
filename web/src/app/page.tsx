@@ -4,7 +4,7 @@ import { objectsApi, HeyamaObject } from '@/lib/api';
 import ObjectCard from '@/components/ObjectCard';
 import CreateObjectForm from '@/components/CreateObjectForm';
 import { useSocket } from '@/lib/useSocket';
-import { Wifi, WifiOff } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 export default function HomePage() {
   const [objects, setObjects] = useState<HeyamaObject[]>([]);
@@ -31,50 +31,64 @@ export default function HomePage() {
   );
 
   useEffect(() => {
-    // Show connected state briefly when socket fires
     if (connected) {
       const t = setTimeout(() => setConnected(false), 3000);
       return () => clearTimeout(t);
     }
   }, [connected]);
 
-  const handleCreated = (obj: HeyamaObject) => {
-    setObjects((prev) => [obj, ...prev]);
-  };
-
   const handleDeleted = (id: string) => {
     setObjects((prev) => prev.filter((o) => o._id !== id));
   };
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Objects</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{objects.length} item{objects.length !== 1 ? 's' : ''}</p>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">Your Collection</h2>
+            <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 text-xs font-bold uppercase tracking-wider border border-indigo-100">
+              Pro
+            </span>
+          </div>
+          <p className="text-slate-500 max-w-md">
+            Manage and organize your digital assets with real-time synchronization across all devices.
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className={`flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full transition-all ${connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-            {connected ? <Wifi size={12} /> : <WifiOff size={12} />}
-            {connected ? 'Live update!' : 'Live'}
-          </span>
-          <CreateObjectForm onCreated={handleCreated} />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-slate-200 shadow-sm">
+            <div className={`w-2 h-2 rounded-full ${connected ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
+            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
+              {connected ? 'Live Sync Active' : 'Offline Mode'}
+            </span>
+          </div>
+          <CreateObjectForm />
         </div>
       </div>
 
+      <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 h-64 animate-pulse" />
+            <div key={i} className="bg-white rounded-2xl border border-slate-200 h-80 animate-pulse shadow-sm" />
           ))}
         </div>
       ) : objects.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
-          <p className="text-lg font-medium">No objects yet</p>
-          <p className="text-sm mt-1">Create one to get started</p>
+        <div className="flex flex-col items-center justify-center py-24 px-4 bg-white rounded-3xl border border-dashed border-slate-300">
+          <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4">
+            <Plus className="text-slate-400" size={32} />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800">No assets found</h3>
+          <p className="text-slate-500 mt-2 text-center max-w-xs">
+            Start by creating your first object. It will appear here and sync instantly.
+          </p>
+          <div className="mt-6">
+            <CreateObjectForm />
+          </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {objects.map((obj) => (
             <ObjectCard key={obj._id} obj={obj} onDeleted={handleDeleted} />
           ))}

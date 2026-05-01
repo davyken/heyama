@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AppController } from './app.controller';
+import { KeepAliveService } from './keep-alive.service';
 import { ObjectsModule } from './objects/objects.module';
 
 @Module({
@@ -13,5 +15,7 @@ import { ObjectsModule } from './objects/objects.module';
     }),
     ObjectsModule,
   ],
+  controllers: [AppController],
+  providers: [KeepAliveService],
 })
 export class AppModule {}

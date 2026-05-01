@@ -23,9 +23,20 @@ export class StorageService implements OnModuleInit {
     return new Promise((resolve, reject) => {
       const publicId = `heyama/${uuidv4()}`;
       
+      const timeout = setTimeout(() => {
+        reject(new Error('Upload timed out after 60 seconds'));
+      }, 60000);
+
       const uploadStream = cloudinary.uploader.upload_stream(
-        { public_id: publicId, folder: 'heyama' },
+        { 
+          public_id: publicId, 
+          folder: 'heyama',
+          resource_type: 'auto',
+          quality: 'auto',
+          fetch_format: 'auto'
+        },
         (error, result) => {
+          clearTimeout(timeout);
           if (error) {
             this.logger.error(`Upload failed: ${error.message}`);
             reject(error);

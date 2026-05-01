@@ -15,18 +15,26 @@ export class ObjectsService {
   ) {}
 
   async create(dto: CreateObjectDto, file: Express.Multer.File): Promise<ObjectDocument> {
-    const { url, key } = await this.storageService.uploadFile(file);
+    let uploadResult: { url: string; key: string } | null = null;
+    try {
+      uploadResult = await this.storageService.uploadFile(file);
 
-    const obj = new this.objectModel({
-      title: dto.title,
-      description: dto.description,
-      imageUrl: url,
-      imageKey: key,
-    });
+      const obj = new this.objectModel({
+        title: dto.title,
+        description: dto.description,
+        imageUrl: uploadResult.url,
+        imageKey: uploadResult.key,
+      });
 
-    const saved = await obj.save();
-    this.eventsGateway.emitNewObject(saved.toJSON());
-    return saved;
+      const saved = await obj.save();
+      this.eventsGateway.emitNewObject(saved.toJSON());
+      return saved;
+    } catch (error) {
+      if (uploadResult?.key) {
+        await this.storageService.deleteFile(uploadResult.key).catch(() => {});
+      }
+      throw error;
+    }
   }
 
   async findAll(): Promise<ObjectDocument[]> {
@@ -34,21 +42,33 @@ export class ObjectsService {
   }
 
   async findOne(id: string): Promise<ObjectDocument> {
-    const obj = await this.objectModel.findById(id).exec();
-    if (!obj) throw new NotFoundException(`Object #${id} not found`);
-    return obj;
+    try {
+      const obj = await this.objectModel.findById(id).exec();
+      if (!obj) throw new NotFoundException(`Object #${id} not found`);
+      return obj;
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new NotFoundException(`Invalid ID or object #${id} not found`);
+    }
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    const obj = await this.objectModel.findById(id).exec();
-    if (!obj) throw new NotFoundException(`Object #${id} not found`);
+    try {
+      const obj = await this.objectModel.findById(id).exec();
+      if (!obj) throw new NotFoundException(`Object #${id} not found`);
 
-    if (obj.imageKey) {
-      await this.storageService.deleteFile(obj.imageKey);
+      if (obj.imageKey) {
+        await this.storageService.deleteFile(obj.imageKey).catch(err => {
+          console.warn(`Failed to delete file for object ${id}:`, err.message);
+        });
+      }
+
+      await this.objectModel.findByIdAndDelete(id).exec();
+      this.eventsGateway.emitDeleteObject(id);
+      return { message: 'Object deleted successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new Error(`Failed to delete object: ${error.message}`);
     }
-
-    await this.objectModel.findByIdAndDelete(id).exec();
-    this.eventsGateway.emitDeleteObject(id);
-    return { message: 'Object deleted successfully' };
   }
 }

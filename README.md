@@ -38,7 +38,6 @@ docker compose up -d
 - MinIO S3 → `localhost:9000`
 - MinIO Console → `localhost:9001` (admin: `minioadmin` / `minioadmin`)
 
----
 
 ### 2. Start the API
 

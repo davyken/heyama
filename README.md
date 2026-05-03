@@ -7,7 +7,7 @@ A full-stack system for managing a collection of "Objects" with image upload.
 | Layer | Technology |
 |---|---|
 | **API** | NestJS + MongoDB + Socket.io |
-| **S3 Storage** | MinIO (self-hosted, S3-compatible, **not Amazon**) |
+| **S3 Storage** | MinIO (self-hosted, cloudinary, S3-compatible, **not Amazon**) |
 | **Web** | Next.js 14 + Tailwind CSS |
 | **Mobile** | React Native + Expo Router |
 | **Real-time** | Socket.io (`object:created` / `object:deleted`) |

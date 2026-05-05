@@ -14,18 +14,6 @@ A full-stack system for managing a collection of "Objects" with image upload.
 
 ---
 
-## Project Structure
-
-```
-heyama-project/
-├── docker-compose.yml     ← MongoDB + MinIO
-├── api/                   ← NestJS REST API + WebSocket
-├── web/                   ← Next.js web app
-└── mobile/                ← React Native Expo mobile app
-```
-
----
-
 ## Getting Started
 
 ### 1. Start Infrastructure (MongoDB + MinIO)

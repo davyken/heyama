@@ -12,8 +12,6 @@ A full-stack system for managing a collection of "Objects" with image upload.
 | **Mobile** | React Native + Expo Router |
 | **Real-time** | Socket.io (`object:created` / `object:deleted`) |
 
---
-
 ---
 
 ## Getting Started

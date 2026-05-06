@@ -14,7 +14,6 @@ A full-stack system for managing a collection of "Objects" with image upload.
 
 ---
 
-## Getting Started
 
 ### 1. Start Infrastructure (MongoDB + MinIO)
 
